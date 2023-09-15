@@ -17,17 +17,14 @@ public class MemberJpaRepository {
         em.persist(member);
         return member;
     }
-
     public void delete(Member member) {
         em.remove(member);
 
     }
-
     public List<Member> findAll() {
         return em.createQuery("select m from Member m", Member.class)
                 .getResultList();
     }
-
     public Optional<Member> findById(Long id) {
         Member member = em.find(Member.class, id);
         return Optional.ofNullable(member);
@@ -38,6 +35,12 @@ public class MemberJpaRepository {
     }
     public Member find(Long id) {
         return em.find(Member.class, id);
+    }
 
+    public List<Member> findByUsernameAndAgeGreaterThan(String username, int age) {
+        return em.createQuery("select m from Member m where m.username = :username and m.age > :age")
+                .setParameter("username", username)
+                .setParameter("age", age)
+                .getResultList();
     }
 }
