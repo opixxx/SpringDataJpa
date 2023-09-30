@@ -156,13 +156,14 @@ class MemberRepositoryTest {
         memberRepository.save(new Member("member3", 10));
         memberRepository.save(new Member("member4", 10));
         memberRepository.save(new Member("member5", 10));
-        
-        int age = 10;
+
+
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
 
-        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+        Page<Member> page = memberRepository.findByAge(10, pageRequest);
 
-        Page<MemberDto> toMap = page.map(m -> new MemberDto(m.getId(), m.getUsername(), null));
+//        Page<MemberDto> toMap = page.map(
+//                m -> new MemberDto(m.getId(), m.getUsername(), null));
 
         List<Member> content = page.getContent();
 
@@ -189,4 +190,35 @@ class MemberRepositoryTest {
 
         assertThat(resultCount).isEqualTo(3);
     }
+
+    @Test
+    public void findMemberLazy () throws Exception {
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> members = memberRepository.findAll();
+
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass());
+            System.out.println("member.team = " + member.getTeam().getName());
+
+        }
+    }
+
 }
